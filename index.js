@@ -1,9 +1,6 @@
-const startup = Date.now();
-require("dotenv").config();
-const published =
-  new Date(item.snippet.publishedAt).getTime();
 
-if (published < startup) continue;
+require("dotenv").config();
+
 const axios = require("axios");
 
 const API_KEY = process.env.YOUTUBE_API_KEY;
@@ -139,7 +136,7 @@ await axios.post(WEBHOOK, {
 
   content:
     type === "live"
-      ? "@everyone 🔴 STREAM BARU!"
+      ? "ADA 🔴 STREAM BARU!"
       : "",
 
   embeds: [embed],
