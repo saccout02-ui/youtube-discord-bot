@@ -1,5 +1,9 @@
+const startup = Date.now();
 require("dotenv").config();
+const published =
+  new Date(item.snippet.publishedAt).getTime();
 
+if (published < startup) continue;
 const axios = require("axios");
 
 const API_KEY = process.env.YOUTUBE_API_KEY;
@@ -58,14 +62,103 @@ async function checkYouTube() {
 
       const videoUrl = `https://youtu.be/${videoId}`;
 
-      await axios.post(WEBHOOK, {
-        content:
-`${emoji} ${status} — ${channel}
+     const thumb =
+  item.snippet.thumbnails.high?.url ||
+  item.snippet.thumbnails.default?.url;
 
-**${title}**
+const channelIcon =
+  item.snippet.thumbnails.default?.url;
 
-${videoUrl}`
-      });
+let color = 0x5865F2;
+
+if (type === "live") {
+  color = 0xFF0000;
+}
+
+if (type === "upcoming") {
+  color = 0xFFA500;
+}
+
+const embed = {
+  color: color,
+
+  author: {
+    name: channel,
+    icon_url: channelIcon,
+    url: `https://youtube.com/channel/${CHANNEL_ID}`
+  },
+
+  title:
+    type === "live"
+      ? "🔴 LIVE SEKARANG"
+      : type === "upcoming"
+      ? "🟠 LIVE UPCOMING"
+      : "📺 Upload Baru",
+
+  description:
+`## ${title}
+
+Klik tombol di bawah untuk menonton.`,
+
+  url: videoUrl,
+
+  thumbnail: {
+    url: thumb
+  },
+
+  image: {
+    url: thumb
+  },
+
+  fields: [
+    {
+      name: "Channel",
+      value: channel,
+      inline: true
+    },
+    {
+      name: "Type",
+      value:
+        type === "live"
+          ? "Live Stream"
+          : type === "upcoming"
+          ? "Upcoming Stream"
+          : "Video Upload",
+      inline: true
+    }
+  ],
+
+  footer: {
+    text: "YouTube Notifier"
+  },
+
+  timestamp: new Date().toISOString()
+};
+
+await axios.post(WEBHOOK, {
+
+  content:
+    type === "live"
+      ? "@everyone 🔴 STREAM BARU!"
+      : "",
+
+  embeds: [embed],
+
+  components: [
+    {
+      type: 1,
+      components: [
+        {
+          type: 2,
+          style: 5,
+          label: "▶ Watch Now",
+          url: videoUrl
+        }
+      ]
+    }
+  ]
+
+});
 
       console.log("Notif terkirim:", title);
     }
@@ -79,4 +172,4 @@ console.log("Bot berjalan...");
 
 checkYouTube();
 
-setInterval(checkYouTube, 60000);
+setInterval(checkYouTube, 15000);
