@@ -169,4 +169,4 @@ console.log("Bot berjalan...");
 
 checkYouTube();
 
-setInterval(checkYouTube, 15000);
+setInterval(checkYouTube, 300000);
